@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>  <!--  驼峰命名法-->
+    </settings>
+
+    <mappers>
+        <mapper resource="Mybatis/design/admin/AdminBaseMapper.xml"/>
+
+        <mapper resource="Mybatis/design/general/StaffMapper.xml"/>
+        <mapper resource="Mybatis/design/general/CourseMapper.xml"/>
+        <mapper resource="Mybatis/design/general/UserMapper.xml"/>
+        <mapper resource="Mybatis/design/general/UserCourseMapper.xml"/>
+        <mapper resource="Mybatis/design/general/UserMoneyMapper.xml"/>
+        <mapper resource="Mybatis/design/general/UserWagesMapper.xml"/>
+        <mapper resource="Mybatis/design/general/ParameterMapper.xml"/>
+
+
+        <mapper resource="Mybatis/design/wechat/WeChatMapper.xml"/>
+        <mapper resource="Mybatis/design/wechat/WeChatBaseMapper.xml"/>
+
+        <mapper resource="Mybatis/design/GeneralMapper.xml"/>
+    </mappers>
+
+</configuration>

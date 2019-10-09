@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>教练员列表</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <link rel="stylesheet" href="../../../layui/layui/css/layui.css" media="all">
+    <link rel="stylesheet" href="../../../layui/style/admin.css" media="all">
+</head>
+<body>
+<div class="layui-card layadmin-header">
+    <div class="layui-breadcrumb" lay-filter="breadcrumb">
+        <a lay-href="">主页</a>
+        <a><cite>员工管理</cite></a>
+        <a><cite>教练员列表</cite></a>
+    </div>
+</div>
+<div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md12">
+            <div class="layui-card">
+                <div class="layui-card-header">教练员列表</div>
+                <div class="layui-card-body">
+                    <div class="user-table" style="margin-bottom: 10px;">
+                        用户名：
+                        <div class="layui-inline">
+                            <input class="layui-input" name="staffName" id="staffName" autocomplete="off">
+                        </div>
+                        <button class="layui-btn" data-type="reload" id="search">搜索</button>
+                    </div>
+                    <table class="layui-hide" id="staffLine" lay-filter="staffLine"></table>
+                    <script type="text/html" id="staff-table-btn">
+                        <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                        <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="stop">停职</a>
+                        <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">开除</a>
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../../../layui/layui/layui.js"></script>
+<script src="../../../jquery/jquery-3.4.1.js"></script>
+<script>
+    layui.config({
+        base: '../../../layui/' //静态资源所在路径
+    }).extend({
+        index: 'lib/index' //主入口模块
+    }).use(['index', 'table'], function () {
+        var table = layui.table
+            ,admin = layui.admin
+            ,layer = layui.layer;
+
+        var objs,indexs;
+
+        //方法级渲染
+        table.render({
+            elem: '#staffLine'
+            , id: "staffLine"
+            , url: "staffData"
+            , cols: [  [
+                { field: 'id', title: '编号'  , minWidth: 70 , sort: true}
+                , {field: 'staffName', title: '姓名' ,edit:"text" , minWidth: 100}
+                , {field: 'staffSex', title: '性别', minWidth: 70 , sort: true ,edit:"text" ,templet: function(d){
+                        return d.staffSex===1?"男":"女";
+                    }}
+                , {field: 'staffNo', title: '身份证号', minWidth: 180 ,edit:"text"}
+                , {field: 'staffPhone', title: '手机号码', minWidth: 120 ,edit:"text"}
+                , {field: 'staffWechat', title: '微信', minWidth: 120 ,edit:"text"}
+                , {field: 'staffMoney', title: '工资', minWidth: 70 , sort: true ,edit:"text"}
+                , {field: 'staffType', title: '工种', minWidth: 70 , sort: true ,templet: function(d){
+                    switch (d.staffType) {
+                        case 4:return "财务";
+                        case 5:return "保洁";
+                        case 6:return "保安";
+                        case 7:return "售货员";
+                        default:return "其他";
+                    }
+                    }}
+                , {field: 'insertTime', title: '入职时间', sort: true, minWidth: 180 }
+                , {title: '操作',width:180, align:'center', fixed: 'right', toolbar: '#user-table-btn'}
+            ]   ]
+            , page: true
+            , limit: 10
+            , height: 490
+        });
+
+        var $ = layui.$, active = {
+            reload: function () {
+                var name = $('#staffName');
+                //执行重载
+                table.reload('staffLine', {
+                    page: {
+                        curr: 1 //重新从第 1 页开始
+                    }
+                    , where: {
+                        name: name.val()
+                        , key: {}
+                    }
+                });
+            }
+        };
+
+        //添加信息提交
+        $('#search').on('click', function(){
+            var type = $(this).data('type');
+            active[type] && active[type].call(this);
+        });
+
+        //监听单元格编辑
+        table.on('edit(staffLine)', function (obj) {
+            var data = obj.data; //得到所在行所有键值
+            console.log(JSON.stringify(data));
+        });
+
+        //监听工具条
+        table.on('tool(staffLine)', function(obj){
+            var id = JSON.stringify(obj.data.id);
+            var data = obj.data; //得到所在行所有键值
+            if(obj.event === 'del'){
+                layer.confirm('真的删除用户么？', function(index){
+                    objs = obj;
+                    indexs = index;
+                    f("del",data);
+                });
+            } else if(obj.event === 'edit'){
+                //layer.alert('编辑行：<br>'+ JSON.stringify(data));
+                 f("update",data);
+            }else if(obj.event === 'stop'){
+                layer.confirm('真的停用用户么？', function(index){
+                    f("stop",data);
+                });
+            }
+        });
+
+        //AjAX提交函数
+        function f (type ,data) {
+            admin.req({
+                url: "staffDataUpdate?type="+type
+                , type: "POST"
+                , data: data
+                , done: function (res) {
+                    layer.msg(res.msg, {
+                        offset: '15px'
+                        , icon: res.status>0?1:2
+                        , time: 1000
+                    },function () {
+                        if(res.status===31){
+                            location.href = 'user'; //刷新
+                        }else if(res.status===51){
+                            objs.del();
+                            layer.close(indexs);
+                        }
+                        return 0
+                    });
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

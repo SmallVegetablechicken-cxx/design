@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sise.design.general.mapper.UserMapper">
+
+    <resultMap id="ResultMap" type="com.sise.design.general.entity.User">
+        <result column="id"            property="id"        />
+        <result column="user_id"       property="userId"      />
+        <result column="user_password" property="userPassword" />
+        <result column="user_name"     property="userName"   />
+        <result column="user_nickname" property="userNickname" />
+        <result column="picture"       property="picture"   />
+        <result column="user_sex"      property="userSex"   />
+        <result column="user_phone"    property="userPhone"   />
+        <result column="user_wechat"   property="userWechat"   />
+        <result column="user_birthday" property="userBirthday"   />
+        <result column="user_classes"  property="userClasses"   />
+        <result column="user_type"     property="userType"   />
+        <result column="org_pass"      property="orgPass"   />
+    </resultMap>
+
+    <sql id="login">
+        id , user_id , user_password , user_name , user_nickname , picture , org_pass
+    </sql>
+
+    <sql id="all">
+        id ,user_id ,user_name ,user_nickname ,picture ,user_sex ,user_phone ,user_wechat ,user_birthday ,user_classes ,user_type
+    </sql>
+
+    <sql id="user_type">
+        and ( user_type = 1 or user_type = 2 or user_type = 0 )
+    </sql>
+
+<!--    <insert id="insertUser" parameterType="com.sise.design.general.entity.userf">-->
+
+<!--    </insert>-->
+
+</mapper>
